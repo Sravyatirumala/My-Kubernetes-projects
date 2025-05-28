@@ -1,370 +1,302 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2639
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fnil\fcharset0 HelveticaNeue-Bold;\f2\fnil\fcharset0 LucidaGrande-Bold;
+Netflix-Clone Project :
+
+
+https://github.com/N4si/DevSecOps-Project.git
+
+
+Netflix clone on kuber : Cloud champ:   Done
+
+https://www.youtube.com/watch?v=g8X5AoqCJHc
+
+
+…………………..>………………………………>…………………..>………………………………>…………………..>………………………………>
+sudo apt-get update
+sudo apt-get install docker.io -y
+sudo usermod -aG docker $USER  # Replace with your system's username, e.g., 'ubuntu'
+newgrp docker
+sudo chmod 777 /var/run/docker.sock
+
+
+
+…………………..>………………………………>…………………..>………………………………>…………………..>………………………………>
+
+
+docker build -t netflix .
+docker run -d --name netflix -p 8083:80 netflix:latest
+
+
+Once Container is run this will show no Videos.
+
+
+We need an API key to see the videos:
+
+Get the API Key:
+
+TMDB (The Movie Database) website.
+Create profile — >In corner click on API key — > create and submit.
+
+
+docker build --build-arg TMDB_V3_API_KEY=<your-api-key> -t netflix .
+…………………..>………………………………>…………………..>………………………………>…………………..>………………………………>
+
+Run Sonnarqube:
+
+docker run -d --name sonar -p 9000:9000 sonarqube:lts-community 
+
+…………………..>………………………………>…………………..>………………………………>…………………..>………………………………>
+Install Trivy:
+
+To install Trivy:
+sudo apt-get install wget apt-transport-https gnupg lsb-release
+wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
+sudo apt-get update
+sudo apt-get install trivy        
+
+…………………..>………………………………>…………………..>………………………………>…………………..>………………………………>
+Install Necessary Plugins in Jenkins:
+Goto Manage Jenkins →Plugins → Available Plugins →
+Install below plugins
+1 Eclipse Temurin Installer (Install without restart)
+2 SonarQube Scanner (Install without restart)
+3 NodeJs Plugin (Install Without restart)
+4 Email Extension Plugin
+Configure Java and Nodejs in Global Tool Configuration
+
+Goto Manage Jenkins → Tools → Install JDK(17) and NodeJs(16)→ Click on Apply and Save
+
+Goto Jenkins Dashboard → Manage Jenkins → Credentials → Add Secret Text.
+
+…………………..>………………………………>…………………..>………………………………>…………………..>………………………………>
+
+
+aws eks update-kubeconfig --region us-east-2 --name my-eks-cluster
+
+
+Jenkins Pipeline:
+
+pipeline {
+    agent any
+
+    tools {
+        jdk 'jdk20'
+        nodejs 'nodeJS'
+    }
+
+    environment {
+        SCANNER_HOME = tool 'sonar-scanner'
+    }
+
+    stages {
+
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage('Checkout from Git') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Sravyatirumala/DevSecOps-Netflix-Project.git'
+            }
+        }
+
+        stage('Sonarqube Analysis') {
+            steps {
+                withSonarQubeEnv('sonar-server') {
+                    sh '''
+                    ${SCANNER_HOME}/bin/sonar-scanner \
+                      -Dsonar.projectName=Netflix \
+                      -Dsonar.projectKey=Netflix
+                    '''
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token'
+                }
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        // stage('OWASP FS SCAN') {
+        //     steps {
+        //         dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+        //         dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+        //     }
+        // }
+
+        stage('TRIVY FS SCAN') {
+            steps {
+                sh 'trivy fs . > trivyfs.txt'
+            }
+        }
+
+        stage('Docker Build & Push') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'Docker-creds') {
+                        sh '''
+                        docker build --build-arg TMDB_V3_API_KEY=6bb6ad58365146a6604a5aaf5f724bd0 -t netflix .
+                        docker tag netflix sravyatirumala/netflix:latest
+                        docker push sravyatirumala/netflix:latest
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('TRIVY Image Scan') {
+            steps {
+                sh 'trivy image sravyatirumala/netflix:latest > trivyimage.txt'
+            }
+        }
+
+stage('Update Kubeconfig') {
+    steps {
+        sh '''
+        echo "Configuring kubectl for EKS cluster..."
+        aws eks update-kubeconfig --region us-east-2 --name my-eks-cluster
+        '''
+    }
 }
-{\colortbl;\red255\green255\blue255;\red220\green161\blue13;}
-{\*\expandedcolortbl;;\cssrgb\c89412\c68627\c3922;}
-{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid1\'02\'00.;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid1}}
-{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}}
-\paperw11900\paperh16840\margl1440\margr1440\vieww28600\viewh14620\viewkind0
-\deftab560
-\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
 
-\f0\fs28 \cf0 Netflix-Clone Project :\
-\
-\
-https://github.com/N4si/DevSecOps-Project.git\
-\
-\
-\pard\pardeftab560\slleading20\partightenfactor0
+        stage('Configure Prometheus & Grafana') {
+            steps {
+                script {
+                    sh '''
+                    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true
+                    helm repo update
 
-\fs26 \cf0 Netflix clone on kuber : Cloud champ:   Done\
-\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
-\cf0 \
-\pard\pardeftab560\slleading20\partightenfactor0
-{\field{\*\fldinst{HYPERLINK "https://www.youtube.com/watch?v=g8X5AoqCJHc"}}{\fldrslt \cf2 https://www.youtube.com/watch?v=g8X5AoqCJHc}}\cf2 \
-\
-\pard\pardeftab560\slleading20\partightenfactor0
+                    kubectl create namespace prometheus || true
 
-\fs28 \cf0 \
-\'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>\'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>\'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>\
-sudo apt-get update\
-sudo apt-get install docker.io -y\
-sudo usermod -aG docker $USER  # Replace with your system's username, e.g., 'ubuntu'\
-newgrp docker\
-sudo chmod 777 /var/run/docker.sock\
-\
-\
-\
-\'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>\'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>\'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>\
-\
-\
-docker build -t netflix .\
-docker run -d --name netflix -p 8083:80 netflix:latest\
-\
-\
-Once Container is run this will show no Videos.\
-\
-\
-We need an API key to see the videos:\
-\
-\pard\pardeftab560\sa40\partightenfactor0
+                    helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack -n prometheus --create-namespace
+                    helm install prometheus-node-exporter prometheus-community/prometheus-node-exporter --namespace prometheus-node-exporter || true
 
-\f1\b \cf0 Get the API Key:\
-\
-TMDB (The Movie Database) website.\
-Create profile \'97 >In corner click on API key \'97 > create and submit.\
-\
-\
-docker build --build-arg TMDB_V3_API_KEY=<your-api-key> -t netflix .\
-\pard\pardeftab560\slleading20\partightenfactor0
+                    kubectl patch svc kube-prometheus-stack-prometheus -n prometheus -p '{"spec": {"type": "LoadBalancer"}}' || true
+                    kubectl patch svc kube-prometheus-stack-grafana -n prometheus -p '{"spec": {"type": "LoadBalancer"}}' || true
+                    '''
+                }
+            }
+        }
 
-\f0\b0 \cf0 \'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>\'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>\'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>
-\f1\b \
-\pard\pardeftab560\sa40\partightenfactor0
-\cf0 \
-Run Sonnarqube:\
-\
-docker run -d --name sonar -p 9000:9000 sonarqube:lts-community \
-\
-\pard\pardeftab560\slleading20\partightenfactor0
+        stage('Configure ArgoCD') {
+            steps {
+                script {
+                    sh '''
+                    kubectl create namespace argocd || true
+                    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+                    kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+                    '''
+                }
+            }
+        }
 
-\f0\b0 \cf0 \'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>\'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>\'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>
-\f1\b \
-\pard\pardeftab560\sa40\partightenfactor0
-\cf0 Install Trivy:\
-\
-To install Trivy:\
-\pard\pardeftab560\slleading20\partightenfactor0
+        stage('Deploy to EKS Cluster') {
+            steps {
+                script {
+                    sh '''
+                    echo "Deploying application to EKS..."
+                    kubectl apply -f Kubernetes/deployment.yml
+                    kubectl apply -f Kubernetes/service.yml
 
-\f0\b0 \cf0 sudo apt-get install wget apt-transport-https gnupg lsb-release\
-wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -\
-echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list\
-sudo apt-get update\
-sudo apt-get install trivy        \
-\pard\pardeftab560\sa40\partightenfactor0
+                    kubectl get pods
+                    kubectl get svc
+                    '''
+                }
+            }
+        }
 
-\f1\b \cf0 \
-\pard\pardeftab560\slleading20\partightenfactor0
+        stage('Destroy Kubernetes Resources') {
+            steps {
+                sh '''
+                kubectl delete svc kubernetes || true
+                kubectl delete deploy netflix-app || true
+                kubectl delete svc netflix-app || true
 
-\f0\b0 \cf0 \'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>\'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>\'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>
-\f1\b \
-\pard\pardeftab560\pardirnatural\partightenfactor0
-\ls1\ilvl0\cf0 Install Necessary Plugins in Jenkins:
-\f0\b0 \
-\pard\pardeftab560\sa40\partightenfactor0
+                kubectl delete -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml || true
+                kubectl delete namespace argocd || true
 
-\f1\b \cf0 Goto Manage Jenkins 
-\f2 \uc0\u8594 
-\f1 Plugins 
-\f2 \uc0\u8594 
-\f1  Available Plugins 
-\f2 \uc0\u8594 
-\f1 \
-Install below plugins\
-1 Eclipse Temurin Installer (Install without restart)\
-2 SonarQube Scanner (Install without restart)\
-3 NodeJs Plugin (Install Without restart)\
-4 Email Extension Plugin\
-\pard\pardeftab560\partightenfactor0
-\cf0 Configure Java and Nodejs in Global Tool Configuration\
-\pard\pardeftab560\sa40\partightenfactor0
-{\field{\*\fldinst{HYPERLINK "https://github.com/N4si/DevSecOps-Project#configure-java-and-nodejs-in-global-tool-configuration"}}{\fldrslt \cf2 \
-}}\pard\pardeftab560\sa40\partightenfactor0
-\cf0 Goto Manage Jenkins 
-\f2 \uc0\u8594 
-\f1  Tools 
-\f2 \uc0\u8594 
-\f1  Install JDK(17) and NodeJs(16)
-\f2 \uc0\u8594 
-\f1  Click on Apply and Save\
-\
-Goto Jenkins Dashboard 
-\f2 \uc0\u8594 
-\f1  Manage Jenkins 
-\f2 \uc0\u8594 
-\f1  Credentials 
-\f2 \uc0\u8594 
-\f1  Add Secret Text.\
-\
-\pard\pardeftab560\slleading20\partightenfactor0
+                helm uninstall kube-prometheus-stack -n prometheus || true
+                kubectl delete namespace prometheus || true
+                '''
+            }
+        }
+    }
 
-\f0\b0 \cf0 \'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>\'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>\'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>
-\f1\b \
-\pard\pardeftab560\sa40\partightenfactor0
-\cf0 \
-\
-aws eks update-kubeconfig --region us-east-2 --name my-eks-cluster\
-\
-\
-Jenkins Pipeline:\
-\
-pipeline \{\
-    agent any\
-\
-    tools \{\
-        jdk 'jdk20'\
-        nodejs 'nodeJS'\
-    \}\
-\
-    environment \{\
-        SCANNER_HOME = tool 'sonar-scanner'\
-    \}\
-\
-    stages \{\
-\
-        stage('Clean Workspace') \{\
-            steps \{\
-                cleanWs()\
-            \}\
-        \}\
-\
-        stage('Checkout from Git') \{\
-            steps \{\
-                git branch: 'main', url: 'https://github.com/Sravyatirumala/DevSecOps-Netflix-Project.git'\
-            \}\
-        \}\
-\
-        stage('Sonarqube Analysis') \{\
-            steps \{\
-                withSonarQubeEnv('sonar-server') \{\
-                    sh '''\
-                    $\{SCANNER_HOME\}/bin/sonar-scanner \\\
-                      -Dsonar.projectName=Netflix \\\
-                      -Dsonar.projectKey=Netflix\
-                    '''\
-                \}\
-            \}\
-        \}\
-\
-        stage('Quality Gate') \{\
-            steps \{\
-                script \{\
-                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token'\
-                \}\
-            \}\
-        \}\
-\
-        stage('Install Dependencies') \{\
-            steps \{\
-                sh 'npm install'\
-            \}\
-        \}\
-\
-        // stage('OWASP FS SCAN') \{\
-        //     steps \{\
-        //         dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'\
-        //         dependencyCheckPublisher pattern: '**/dependency-check-report.xml'\
-        //     \}\
-        // \}\
-\
-        stage('TRIVY FS SCAN') \{\
-            steps \{\
-                sh 'trivy fs . > trivyfs.txt'\
-            \}\
-        \}\
-\
-        stage('Docker Build & Push') \{\
-            steps \{\
-                script \{\
-                    withDockerRegistry(credentialsId: 'Docker-creds') \{\
-                        sh '''\
-                        docker build --build-arg TMDB_V3_API_KEY=6bb6ad58365146a6604a5aaf5f724bd0 -t netflix .\
-                        docker tag netflix sravyatirumala/netflix:latest\
-                        docker push sravyatirumala/netflix:latest\
-                        '''\
-                    \}\
-                \}\
-            \}\
-        \}\
-\
-        stage('TRIVY Image Scan') \{\
-            steps \{\
-                sh 'trivy image sravyatirumala/netflix:latest > trivyimage.txt'\
-            \}\
-        \}\
-\
-stage('Update Kubeconfig') \{\
-    steps \{\
-        sh '''\
-        echo "Configuring kubectl for EKS cluster..."\
-        aws eks update-kubeconfig --region us-east-2 --name my-eks-cluster\
-        '''\
-    \}\
-\}\
-\
-        stage('Configure Prometheus & Grafana') \{\
-            steps \{\
-                script \{\
-                    sh '''\
-                    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts || true\
-                    helm repo update\
-\
-                    kubectl create namespace prometheus || true\
-\
-                    helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack -n prometheus --create-namespace\
-                    helm install prometheus-node-exporter prometheus-community/prometheus-node-exporter --namespace prometheus-node-exporter || true\
-\
-                    kubectl patch svc kube-prometheus-stack-prometheus -n prometheus -p '\{"spec": \{"type": "LoadBalancer"\}\}' || true\
-                    kubectl patch svc kube-prometheus-stack-grafana -n prometheus -p '\{"spec": \{"type": "LoadBalancer"\}\}' || true\
-                    '''\
-                \}\
-            \}\
-        \}\
-\
-        stage('Configure ArgoCD') \{\
-            steps \{\
-                script \{\
-                    sh '''\
-                    kubectl create namespace argocd || true\
-                    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml\
-                    kubectl patch svc argocd-server -n argocd -p '\{"spec": \{"type": "LoadBalancer"\}\}'\
-                    '''\
-                \}\
-            \}\
-        \}\
-\
-        stage('Deploy to EKS Cluster') \{\
-            steps \{\
-                script \{\
-                    sh '''\
-                    echo "Deploying application to EKS..."\
-                    kubectl apply -f Kubernetes/deployment.yml\
-                    kubectl apply -f Kubernetes/service.yml\
-\
-                    kubectl get pods\
-                    kubectl get svc\
-                    '''\
-                \}\
-            \}\
-        \}\
-\
-        stage('Destroy Kubernetes Resources') \{\
-            steps \{\
-                sh '''\
-                kubectl delete svc kubernetes || true\
-                kubectl delete deploy netflix-app || true\
-                kubectl delete svc netflix-app || true\
-\
-                kubectl delete -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml || true\
-                kubectl delete namespace argocd || true\
-\
-                helm uninstall kube-prometheus-stack -n prometheus || true\
-                kubectl delete namespace prometheus || true\
-                '''\
-            \}\
-        \}\
-    \}\
-\
-    post \{\
-        always \{\
-            emailext(\
-                attachLog: true,\
-                subject: "'$\{currentBuild.result\}'",\
-                body: "Project: $\{env.JOB_NAME\}<br/>" +\
-                      "Build Number: $\{env.BUILD_NUMBER\}<br/>" +\
-                      "URL: $\{env.BUILD_URL\}<br/>",\
-                to: 'tvsravya95@gmail.com',\
-                attachmentsPattern: 'trivyfs.txt,trivyimage.txt'\
-            )\
-        \}\
-    \}\
-\}\
-\pard\pardeftab560\slleading20\partightenfactor0
-
-\f0\b0 \cf0 \'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>\'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>\'85\'85\'85\'85\'85\'85\'85..>\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85>
-\f1\b \
-\pard\pardeftab560\sa40\partightenfactor0
-\cf0 \
-To Get prometheus , argocd and grafana password.\
-\
-Vi argocd-access.sh\
-\
-#!/bin/bash\
-# This script is used to get the argocd, prometheus & grafana urls & credentials\
-\
-aws configure\
-aws eks update-kubeconfig --region "us-east-2\'94 --name \'93my\'94-eks-cluster\
-\
-# ArgoCD Access\
-argo_url=$(kubectl get svc -n argocd | grep argocd-server | awk '\{print$4\}' | head -n 1)\
-argo_initial_password=$(argocd admin initial-password -n argocd)\
-\
-# ArgoCD Credentials\
-argo_user="admin"\
-\
-argo_password=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="\{.data.password\}" | base64 --decode)\
-\
-# Prometheus and Grafana URLs and credentials\
-prometheus_url=$(kubectl get svc -n prometheus | grep stable-kube-prometheus-sta-prometheus | awk '\{print $4\}')\
-grafana_url=$(kubectl get svc -n prometheus | grep stable-grafana | awk '\{print $4\}')\
-grafana_user="admin"\
-grafana_password=$(kubectl get secret stable-grafana -n prometheus -o jsonpath="\{.data.admin-password\}" | base64 --decode)\
-\
-# Print or use these variables\
-echo "------------------------"\
-echo "ArgoCD URL: $argo_url"\
-echo "ArgoCD User: $argo_user"\
-echo "ArgoCD Initial Password: $argo_initial_password" | head -n 1\
-echo\
-echo "Prometheus URL: $prometheus_url":9090\
-echo\
-echo "Grafana URL: $grafana_url"\
-echo "Grafana User: $grafana_user"\
-echo "Grafana Password: $grafana_password"\
-echo "------------------------"\
-\
-# Run below commands\
-# chmod a+x argocd-access.sh\
-# ./argocd-access.sh\
-\
-\
-root@ip-10-0-2-232:~# kubectl get secret kube-prometheus-stack-grafana -n prometheus -o jsonpath="\{.data.admin-password\}" | base64 --decode\
-\
-docker images\
-\
-docker run -d -p 8083:80 Netflix:latest/\
-\
-Note: We can get the image name and port number from Deployment.yml and then we can run the container.\
-\
-\
+    post {
+        always {
+            emailext(
+                attachLog: true,
+                subject: "'${currentBuild.result}'",
+                body: "Project: ${env.JOB_NAME}<br/>" +
+                      "Build Number: ${env.BUILD_NUMBER}<br/>" +
+                      "URL: ${env.BUILD_URL}<br/>",
+                to: 'tvsravya95@gmail.com',
+                attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
+            )
+        }
+    }
 }
+…………………..>………………………………>…………………..>………………………………>…………………..>………………………………>
+
+To Get prometheus , argocd and grafana password.
+
+Vi argocd-access.sh
+
+#!/bin/bash
+# This script is used to get the argocd, prometheus & grafana urls & credentials
+
+aws configure
+aws eks update-kubeconfig --region "us-east-2” --name “my”-eks-cluster
+
+# ArgoCD Access
+argo_url=$(kubectl get svc -n argocd | grep argocd-server | awk '{print$4}' | head -n 1)
+argo_initial_password=$(argocd admin initial-password -n argocd)
+
+# ArgoCD Credentials
+argo_user="admin"
+
+argo_password=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode)
+
+# Prometheus and Grafana URLs and credentials
+prometheus_url=$(kubectl get svc -n prometheus | grep stable-kube-prometheus-sta-prometheus | awk '{print $4}')
+grafana_url=$(kubectl get svc -n prometheus | grep stable-grafana | awk '{print $4}')
+grafana_user="admin"
+grafana_password=$(kubectl get secret stable-grafana -n prometheus -o jsonpath="{.data.admin-password}" | base64 --decode)
+
+# Print or use these variables
+echo "------------------------"
+echo "ArgoCD URL: $argo_url"
+echo "ArgoCD User: $argo_user"
+echo "ArgoCD Initial Password: $argo_initial_password" | head -n 1
+echo
+echo "Prometheus URL: $prometheus_url":9090
+echo
+echo "Grafana URL: $grafana_url"
+echo "Grafana User: $grafana_user"
+echo "Grafana Password: $grafana_password"
+echo "------------------------"
+
+# Run below commands
+# chmod a+x argocd-access.sh
+# ./argocd-access.sh
+
+
+root@ip-10-0-2-232:~# kubectl get secret kube-prometheus-stack-grafana -n prometheus -o jsonpath="{.data.admin-password}" | base64 --decode
+
+docker images
+
+docker run -d -p 8083:80 Netflix:latest/
+
+Note: We can get the image name and port number from Deployment.yml and then we can run the container.
+
+
