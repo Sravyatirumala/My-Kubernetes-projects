@@ -1,0 +1,6 @@
+[submodule "Jenkins_shared-Library"]
+	path = Jenkins_shared-Library
+	url = https://github.com/Sravyatirumala/Jenkins_shared-Library.git
+[submodule "NetflixStatic-websites"]
+	path = NetflixStatic-websites
+	url = https://github.com/Sravyatirumala/Netflix-websiteStatic-host-s3.git

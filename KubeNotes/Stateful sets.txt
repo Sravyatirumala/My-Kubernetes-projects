@@ -1,0 +1,157 @@
+StatefulSets
+
+# Create a namespace
+kubectl create namespace mysql
+
+# Create ConfigMap
+vi my-sql-cm.yaml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+data:
+  my.cnf: |
+    [mysqld]
+    datadir=/var/lib/mysql
+    socket=/var/run/mysqld/mysqld.sock
+
+kubectl apply -f my-sql-cm.yaml -n mysql
+kubectl get configmaps -n mysql
+
+------------------------------------------------------------
+
+# Create StorageClass
+vi my-sql-sc.yaml
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gcp-storage-class
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-standard
+reclaimPolicy: Delete
+
+kubectl apply -f my-sql-sc.yaml -n mysql
+kubectl get storageclass
+
+------------------------------------------------------------
+
+# Create Secret
+vi my-sql-secret.yaml
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secret
+type: Opaque
+data:
+  mysql-root-password: U2VjdXJlKjEyMw==
+
+kubectl apply -f my-sql-secret.yaml -n mysql
+
+# To create mysql generic password:
+kubectl create secret generic mysql-root-password \
+  --from-literal=password=YOUR_ROOT_PASSWORD \
+  --namespace mysql
+
+kubectl get secret mysql-root-password --namespace mysql -o yaml
+
+# Sample output:
+apiVersion: v1
+data:
+  password: WU9VUl9ST09UX1BBU1NXT1JE
+kind: Secret
+metadata:
+  creationTimestamp: "2025-03-19T10:43:07Z"
+  name: mysql-root-password
+  namespace: mysql
+  resourceVersion: "2230"
+  uid: 7b0c9ebe-0093-43b2-9bbd-0785f5ee76d2
+type: Opaque
+
+------------------------------------------------------------
+
+# Create Service (Headless)
+vi my-sql-service.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  selector:
+    app: mysql
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  clusterIP: None  # Headless
+
+kubectl apply -f my-sql-service.yaml -n mysql
+kubectl get svc -n mysql
+
+------------------------------------------------------------
+
+# Create StatefulSet
+vi my-sql-sts.yaml
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  serviceName: mysql
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:latest
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-root-password
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: data-volume
+              mountPath: /var/lib/mysql
+            - name: mysql-config
+              mountPath: /etc/mysql/conf.d
+              readOnly: true
+      volumes:
+        - name: mysql-config
+          configMap:
+            name: mysql-config
+  volumeClaimTemplates:
+    - metadata:
+        name: data-volume
+      spec:
+        storageClassName: gcp-storage-class
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+
+kubectl apply -f my-sql-sts.yaml -n mysql
+kubectl get statefulsets -n mysql
+
+------------------------------------------------------------
+
+# By default, StatefulSets create persistent volumes for each pod
+kubectl get pvc -n mysql
+
+
+

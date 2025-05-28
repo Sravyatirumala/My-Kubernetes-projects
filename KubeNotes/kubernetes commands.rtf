@@ -1,0 +1,86 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2639
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 HelveticaNeue;\f2\fnil\fcharset0 HelveticaNeue-Bold;
+}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 Commands\
+:\
+\
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f1\fs26 \cf0 Create Docker file take it from abhishek  or any public image.\
+\
+1. Create Deployment.yml : we can change labels and selectors and templates name. Keep it same. Give docker image name which u have created.\
+\
+2. Create service.yml : Get the app name from deployment file only inside template. app: sample-python-app and change node port same  given in deployment file .\
+We can give type: Loadbalancer here itself.\
+\
+3. Create ingress.yml:  give host domain name and service  name as same \
+\
+4. Create ingress-tls.yml: give hosts domain name and in secrets we need to create secret to make for Https.\
+\
+\
+\
+Kubectl apply -f Deployment.yml and service.yml , ingress.yml and ingress-tls.yml\
+\
+Kubectl get svc : To We can see of its a load bar or cluster based on  our requirements. \
+\
+Docker image public :  cmilanf/docker-snake. 3000 port\
+\
+Kubectl get ing : ingress.ymli\
+\
+\
+First create controller:\
+\
+kubectl apply -f https://raw.githubusercontent.com/awsdevop183/kubernetes-ingress/main/nginx-ingress-controller.yml\
+\
+For http to https certification:\
+\
+This will generate TXT dns and give this in Route53 hosted zone record.\
+\
+certbot certonly --manual --preferred-challenges=dns --key-type rsa --email \\\
+tvsravya95@gmail.com \\\
+--server https://acme-v02.api.letsencrypt.org/directory --agree-tos \\\
+-d *.kuttysravya.shop -d kuttysravya.shop\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 cd /etc/letsencrypt/live/kuttysravya.shop/\
+cat fullchain.pem > tls.crt\
+cat privkey.pem > tls.key\
+\
+Kubectl apply -f ingress-tls.yml\
+\
+\
+Then. Create secret :\
+\
+kubectl create secret tls awscloudops --cert=tls.crt --key=tls.key.   awscloudops shop is secretkey name we provide. We can write any name.\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f2\b \cf0 To improve Jenkins performance.\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Go to Jenkins /var/lib/jenkins\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0  sudo nano jenkins.model.JenkinsLocationConfiguration.xml. \'97> give current Jenkins url in this.\
+\
+Sudo systemctl restart jenkins.\
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f1\b0 \cf0 \'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\
+\
+\
+\
+\
+}

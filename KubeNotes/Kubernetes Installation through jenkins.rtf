@@ -1,0 +1,176 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2639
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue-Bold;\f1\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;\red220\green161\blue13;}
+{\*\expandedcolortbl;;\cssrgb\c89412\c68627\c3922;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab560
+\pard\pardeftab560\partightenfactor0
+
+\f0\b\fs40 \cf0 Jenkins job; \
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+
+\f1\b0\fs26 \cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Click This project is parameterized \
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Action\
+\
+Choose: \
+Build\
+Destroy\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Build steps:\
+\
+EXecute shell:\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 #!/bin/bash\
+sudo cp -r * /home/ubuntu/terraform/\
+cd /home/ubuntu/terraform/\
+\
+\
+# Check the value of the ACTION parameter and run either apply or destroy\
+if [ "$Action" == "Build" ]; then\
+# Initialize Terraform (this will set up the Terraform environment, download providers, etc.)\
+sudo terraform init\
+# Run the Terraform plan to see what will be created or destroyed\
+sudo terraform plan -out=tfplan\
+sudo terraform validate\
+    echo "Applying Terraform plan to build infrastructure..."\
+\
+sudo terraform apply -auto-approve tfplan\
+   sudo aws eks update-kubeconfig --name my-eks-cluster\
+elif [ "$Action" == "Destroy" ]; then\
+    echo "Destroying infrastructure..."\
+   sudo terraform destroy -auto-approve\
+   echo "Removing jenkins workspace to free up the memory..."\
+   sudo rm -rf * /var/lib/jenkins/workspace/eks-cluster/\
+   sudo shutdown\
+else\
+    echo "Invalid action. Please choose either 'build' or 'destroy'."\
+    exit 1\
+fi\
+# Clean up the plan file\
+rm -f tfplan\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Visudo\
+\
+jenkins ALL=(ALL:ALL) NOPASSWD: ALL\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Install terraform in instance\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg\
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list\
+sudo apt update && sudo apt install terraform\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Install Jenkins:\
+sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \\\
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key\
+echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" \\\
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \\\
+  /etc/apt/sources.list.d/jenkins.list 
+\f0\b >
+\f1\b0  /dev/null\
+sudo apt-get update\
+sudo apt-get install jenkins\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 AWS CLI:\
+sudo apt-get install python3-pip\
+sudo pip install awscli\
+\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Give IAM Ec2Admin role to this instance.\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Start build and create cluster\
+\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 sudo apt install docker.io -y\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 sudo systemctl  enable docker\
+sudo systemctl status docker\
+sudo systemctl start docker\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Aws cli install:\
+sudo apt install curl unzip\
+curl "{\field{\*\fldinst{HYPERLINK "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"}}{\fldrslt \cf2 \ul \ulc2 https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip}}" -o "awscliv2.zip"\
+unzip awscliv2.zip\
+sudo ./aws/install\
+Aws configure:  give secret access keys\
+\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Kubectl:\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 chmod +x kubectl\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 kubectl version --client\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 kubectl version --client --output=yaml. Detailed view\
+\
+\
+\
+EksCtl:\
+\
+sudo curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | sudo tar xz -C /usr/local/bin\
+\
+\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\
+}

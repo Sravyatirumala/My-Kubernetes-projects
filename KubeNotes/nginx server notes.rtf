@@ -1,0 +1,91 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2639
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue-Bold;}
+{\colortbl;\red255\green255\blue255;\red220\green161\blue13;}
+{\*\expandedcolortbl;;\cssrgb\c89412\c68627\c3922;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab560
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+
+\f0\b\fs26 \cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 cd /etc/nginx/sites-enabled/   < keep your domain info here to where it has to go>\
+cd /var/www/html/. <keep  html file here>\
+Update record A in  route53 with just IP address.\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Sites-enabled:\
+server \{\
+        listen 80;\
+        server_name kuttysravya.shop www.kuttysravya.shop;\
+        return 301 https://$server_name$request_uri;\
+        location / \{\
+                proxy_pass http://localhost;\
+                include proxy_params;\
+        \}\
+\}\
+\
+server \{\
+        listen 443 ssl;\
+        server_name kuttysravya.shop www.kuttysravya.shop;\
+\
+        ssl_certificate /etc/letsencrypt/live/kuttysravya.shop/fullchain.pem;\
+        ssl_certificate_key /etc/letsencrypt/live/kuttysravya.shop/privkey.pem;\
+\
+        location / \{\
+                root /var/www/html;\
+                index index.html index.htm;\
+        \}\
+\}\
+\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 certbot certonly --manual --preferred-challenges=dns --key-type rsa --email \\\
+tvsravya95@gmail.com \\\
+--server https://acme-v02.api.letsencrypt.org/directory --agree-tos \\\
+-d *.kuttysravya.shop -d kuttysravya.shop\
+Saving debug log to /var/log/letsencrypt/letsencrypt.log\
+\
+\
+\
+\
+Check name servers in domain Dns in go daddy.\
+\
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+{\field{\*\fldinst{HYPERLINK "https://github.com/awsdevop183/kubernetes-ingress"}}{\fldrslt \cf2 https://github.com/awsdevop183/kubernetes-ingress}}\
+\
+https://www.youtube.com/watch?v=WBnF0yITFmo\
+\
+\
+\
+\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Bluegreen deployments Jenkins in Kube\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+{\field{\*\fldinst{HYPERLINK "https://medium.com/@sriharimalapati/cicd-blue-green-deployment-pipeline-for-production-environment-7fae3662aebf"}}{\fldrslt \cf2 https://medium.com/@sriharimalapati/cicd-blue-green-deployment-pipeline-for-production-environment-7fae3662aebf}}\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 To improve Jenkins performance.\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Go to Jenkins /var/lib/jenkins\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0  sudo nano jenkins.model.JenkinsLocationConfiguration.xml. \'97> give current Jenkins url in this.\
+\
+Sudo systemctl restart jenkins.\
+\
+\
+find / -type f -size +300M -exec ls -lh \{\} + 2>/dev/null | sort -k5 -rh\
+find / -type f -size +300M -exec ls -lh \{\};}

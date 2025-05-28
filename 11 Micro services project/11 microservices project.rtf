@@ -1,0 +1,416 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2639
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue-Bold;\f1\fnil\fcharset0 HelveticaNeue;\f2\froman\fcharset0 Times-Roman;
+}
+{\colortbl;\red255\green255\blue255;\red220\green161\blue13;\red16\green16\blue23;\red255\green255\blue255;
+}
+{\*\expandedcolortbl;;\cssrgb\c89412\c68627\c3922;\cssrgb\c7843\c7843\c12157;\cssrgb\c100000\c100000\c100000;
+}
+\paperw11900\paperh16840\margl1440\margr1440\vieww28600\viewh14620\viewkind0
+\deftab560
+\pard\pardeftab560\partightenfactor0
+
+\f0\b\fs40 \cf0 sudo rm -rf /var/lib/jenkins/workspace/* except cluster\
+\
+\
+AWSCLI\
+\pard\pardeftab560\sa40\partightenfactor0
+{\field{\*\fldinst{HYPERLINK "https://github.com/Sravyatirumala/Microservice/blob/Infra-Steps/setup-infra.md#awscli"}}{\fldrslt 
+\fs32 \cf2 \
+}}\pard\pardeftab560\slleading20\partightenfactor0
+
+\f1\b0\fs26 \cf0 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"\
+sudo apt install unzip\
+unzip awscliv2.zip\
+sudo ./aws/install\
+aws configure\
+\pard\pardeftab560\sa40\partightenfactor0
+
+\f0\b\fs32 \cf0 \
+KUBECTL\
+\pard\pardeftab560\sa40\partightenfactor0
+{\field{\*\fldinst{HYPERLINK "https://github.com/Sravyatirumala/Microservice/blob/Infra-Steps/setup-infra.md#kubectl"}}{\fldrslt \cf2 \
+}}\pard\pardeftab560\slleading20\partightenfactor0
+
+\f1\b0\fs26 \cf0 curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.19.6/2021-01-05/bin/linux/amd64/kubectl\
+chmod +x ./kubectl\
+sudo mv ./kubectl /usr/local/bin\
+kubectl version --short --client\
+\pard\pardeftab560\sa40\partightenfactor0
+
+\f0\b\fs32 \cf0 \
+EKSCTL\
+\pard\pardeftab560\sa40\partightenfactor0
+{\field{\*\fldinst{HYPERLINK "https://github.com/Sravyatirumala/Microservice/blob/Infra-Steps/setup-infra.md#eksctl"}}{\fldrslt \cf2 \
+}}\pard\pardeftab560\slleading20\partightenfactor0
+
+\f1\b0\fs26 \cf0 curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp\
+sudo mv /tmp/eksctl /usr/local/bin\
+eksctl version\
+\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 \
+Microservices project :\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+https://github.com/Sravyatirumala/Microservice\
+\
+Create Ec2 instance, jenkins, Kube cluster.\
+\
+In jenkins plugin : Multibranch Scan Webhook trigger plugin.\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\
+\
+\
+Create Pipeline : Multibranch Pipeline \'97> Git URL \'97> Build Configuration : Jenkinsfile \'97>\
+ Scan Multibranch Pipeline : Scan by Webhook : Sravya  ?  Apply save.\
+\
+http://3.138.66.92:8080/multibranch-webhook-trigger/invoke?token\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs28 \cf3 \cb4 \expnd0\expndtw0\kerning0
+JENKINS_URL/multibranch-webhook-trigger/invoke?token=
+\fs26 \cf0 \cb1 \kerning1\expnd0\expndtw0 \
+\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 Copy and go to setting in git : web hooks : Payload URL  http://3.138.66.92:8080/multibranch-webhook-trigger/invoke?token .   Add web hook.  \
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\
+\
+This will run  the pipeline and it willl be successful.\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\
+For CD process.\
+\
+ kubectl   create namespace webapps \
+\
+Vi service.yml\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 apiVersion: v1\
+kind: ServiceAccount\
+metadata:\
+  name: jenkins\
+  namespace: webapps\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+kubectl apply -f service.yml \
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\
+\
+Vi role.yml\
+apiVersion: rbac.authorization.k8s.io/v1\
+kind: Role\
+metadata:\
+  name: app-role\
+  namespace: webapps\
+rules:\
+  - apiGroups:\
+        - ""\
+        - apps\
+        - autoscaling\
+        - batch\
+        - extensions\
+        - policy\
+        - rbac.authorization.k8s.io\
+    resources:\
+      - pods\
+      - componentstatuses\
+      - configmaps\
+      - daemonsets\
+      - deployments\
+      - events\
+      - endpoints\
+      - horizontalpodautoscalers\
+      - ingress\
+      - jobs\
+      - limitranges\
+      - namespaces\
+      - nodes\
+      - pods\
+      - persistentvolumes\
+      - persistentvolumeclaims\
+      - resourcequotas\
+      - replicasets\
+      - replicationcontrollers\
+      - serviceaccounts\
+      - services\
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]\
+\
+kubectl apply -f role.yml \
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\
+\
+Vi bindrole.yml\
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 apiVersion: rbac.authorization.k8s.io/v1\
+kind: RoleBinding\
+metadata:\
+  name: app-rolebinding\
+  namespace: webapps \
+roleRef:\
+  apiGroup: rbac.authorization.k8s.io\
+  kind: Role\
+  name: app-role \
+subjects:\
+- namespace: webapps \
+  kind: ServiceAccount\
+  name: jenkins \
+\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 kubectl apply -f bindrole.yml \
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\
+Generate token :\
+\
+Vi  secret.yml\
+\
+apiVersion: v1\
+kind: Secret\
+type: kubernetes.io/service-account-token\
+metadata:\
+  name: mysecretname\
+  annotations:\
+    kubernetes.io/service-account.name: jenkins.  (Jenkins name Given in bindrole name)\
+\
+kubectl apply -f secret.yml -n webapps\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\
+\
+kubectl get all -n webapps\
+\
+kubectl describe secret mysecretname -n webapps.  // To get secret . \
+\
+token:      eyJhbGciOiJSUzI1NiIsImtpZCI6Ik5WUE9VU0ttd01kbnpaTnhZX1B2YzVRYzFmTFJBZl9nRjRjcVdzdzJqbG8ifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJ3ZWJhcHBzIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6Im15c2VjcmV0bmFtZSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50Lm5hbWUiOiJqZW5raW5zIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiMGY0MDAxMGEtNzEyNy00OGM0LTlmOTQtMDkzNmUwZjE3ZGU3Iiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50OndlYmFwcHM6amVua2lucyJ9.ZokZ-Ua23Y5PoY17ohSIvjf_DvR3mUOzJlpyzQPL9-5Xbeqo3QLKCbxENtPZD5VIPpIA5McLXxpepUFHHma0_aKvSY2yC5q28atroOZSWhk_UmmiR7XFo8L5R4Yrvul1JA1k6Hn4HsjU3_p7AloZuoNaMNSzAqyJ99k-cqAIXSyxwudUQFDRkeVI3T3N4AGbRzlzS5uIrS5MrgWMmciIUNO2Jlq_YGnY1LI03Lmb-yBLuBt3srxMyk_wSG3lpvsobBX3iqlaYEpXZTT6zVi-WAFXAC7fuI74yG81-CWx31vcblGO9l6AnAWzGDg1ShYKgJJbybBRw70Dqjbu3C1zYg\
+\
+Keep this token in jenkins \'97> Credentials : k8-token\
+And give cluster end -point URL in Jenkinfile.\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85.\
+\
+Run the project .\
+\
+kubectl get all -n webapps\
+\
+\
+\
+\
+To delete from local after pushing :\
+\
+      post \{\
+        always \{\
+            // Cleanup actions, such as removing temporary files or notifying users\
+            echo 'Pipeline finished, cleaning up workspace.'\
+            cleanWs()  // Optional: you can clean the workspace again if necessary\
+        \}\
+        success \{\
+            echo 'Build and Push completed successfully!'\
+        \}\
+        failure \{\
+            echo 'Build or Push failed, please check the logs!'\
+        \}\
+\
+\
+\
+\
+Dockerfile\
+\
+FROM python:3.11.1-slim@sha256:1591aa8c01b5b37ab31dbe5662c5bdcf40c2f1bce4ef1c1fd24802dae3d01052 as base\
+\
+FROM base as builder\
+\
+COPY requirements.txt .\
+\
+RUN pip install --prefix="/install" -r requirements.txt\
+\
+FROM base\
+\
+WORKDIR /loadgen\
+\
+COPY --from=builder /install /usr/local\
+\
+# Add application code.\
+COPY locustfile.py .\
+\
+# enable gevent support in debugger\
+ENV GEVENT_SUPPORT=True\
+\
+ENTRYPOINT locust --host="http://$\{FRONTEND_ADDR\}" --headless -u "$\{USERS:-10\}" 2>&1\
+\
+\
+\
+\
+Jenkinsfile \
+pipeline \{\
+    agent any\
+\
+    environment \{\
+        SCANNER_HOME = tool 'sonar-scanner'\
+    \}\
+\
+    stages \{\
+        stage('Clean Workspace') \{\
+            steps \{\
+                cleanWs()\
+            \}\
+        \}\
+\
+        stage('SonarQube Analysis') \{\
+            steps \{\
+                withSonarQubeEnv('sonar-server') \{\
+                    sh ''' \
+                    $SCANNER_HOME/bin/sonar-scanner \\\
+                        -Dsonar.projectName=Microservice \\\
+                        -Dsonar.projectKey=Microservice\
+                    '''\
+                \}\
+            \}\
+        \}\
+\
+        stage('Quality Gate') \{\
+            steps \{\
+                script \{\
+                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token'\
+                \}\
+            \}\
+        \}\
+\
+        stage('Trivy FS Scan') \{\
+            steps \{\
+                sh 'trivy fs . > trivyfs.txt'\
+            \}\
+        \}\
+\
+        stage('Build & Tag Docker Image') \{\
+            steps \{\
+                script \{\
+                    withDockerRegistry(credentialsId: 'Docker-creds', toolName: 'docker') \{\
+                        sh "docker build --no-cache -t sravyatirumala/loadgenerator:latest ."\
+                    \}\
+                \}\
+            \}\
+        \}\
+\
+        stage('Push Docker Image') \{\
+            steps \{\
+                script \{\
+                    withDockerRegistry(credentialsId: 'Docker-creds', toolName: 'docker') \{\
+                        sh "docker push sravyatirumala/loadgenerator:latest"\
+                    \}\
+                \}\
+            \}\
+        \}\
+    \}\
+\
+    post \{\
+        always \{\
+            // Cleanup actions, such as removing temporary files or notifying users\
+            echo 'Pipeline finished, cleaning up workspace.'\
+            cleanWs()  // Optional: you can clean the workspace again if necessary\
+        \}\
+        success \{\
+            echo 'Build and Push completed successfully!'\
+        \}\
+        failure \{\
+            echo 'Build or Push failed, please check the logs!'\
+        \}\
+    \}\
+\}\
+\
+\
+\
+\
+\
+pipeline \{\
+    agent any\
+\
+    environment \{\
+        SCANNER_HOME = tool 'sonar-scanner'\
+    \}\
+\
+    stages \{\
+        stage('Clean Workspace') \{\
+            steps \{\
+                cleanWs()\
+            \}\
+        \}\
+\
+        stage('Checkout from Git') \{\
+            steps \{\
+                git branch: 'main', url: 'https://github.com/Sravyatirumala/Microservice.git'\
+                sh 'ls -la'  // Verify files after checkout\
+            \}\
+        \}\
+\
+        stage('SonarQube Analysis') \{\
+            steps \{\
+                withSonarQubeEnv('sonar-server') \{\
+                    sh '''\
+                    $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Microservice \\\
+                    -Dsonar.projectKey=Microservice\
+                    '''\
+                \}\
+            \}\
+        \}\
+\
+        stage('Quality Gate') \{\
+            steps \{\
+                script \{\
+                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token'\
+                \}\
+            \}\
+        \}\
+\
+        stage('Build & Tag Docker Image') \{\
+            steps \{\
+                script \{\
+                    // Check for Dockerfile existence before building\
+                    def dockerFileExists = fileExists('adservice/Dockerfile')\
+                    if (dockerFileExists) \{\
+                        withDockerRegistry(credentialsId: 'docker', toolName: 'docker') \{\
+                            sh ''' \
+                            echo "Building Docker image..."\
+                            docker build --no-cache -t sravyatirumala/adservice:latest ."\
+                            '''\
+                        \}\
+                    \} else \{\
+                        error "Dockerfile not found in the workspace!"\
+                    \}\
+                \}\
+            \}\
+        \}\
+\
+        stage('Push Docker Image') \{\
+            steps \{\
+                script \{\
+                    withDockerRegistry(credentialsId: 'Docker-creds', toolName: 'docker') \{\
+                        sh "docker push sravyatirumala/adservice:latest"\
+                    \}\
+                \}\
+            \}\
+        \}\
+    \}\
+\
+    post \{\
+        always \{\
+            // Cleanup actions, such as removing temporary files or notifying users\
+            echo 'Pipeline finished, cleaning up workspace.'\
+            cleanWs()  // Optional: you can clean the workspace again if necessary\
+        \}\
+        success \{\
+            echo 'Build and Push completed successfully!'\
+        \}\
+        failure \{\
+            echo 'Build or Push failed, please check the logs!'\
+        \}\
+    \}\
+\}\
+\
+\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+
+\f2\fs28 \cf3 \expnd0\expndtw0\kerning0
+\
+}

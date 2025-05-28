@@ -1,0 +1,182 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2639
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fnil\fcharset0 HelveticaNeue-Bold;}
+{\colortbl;\red255\green255\blue255;\red220\green161\blue13;}
+{\*\expandedcolortbl;;\cssrgb\c89412\c68627\c3922;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid1\'02\'00.;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid101\'02\'00.;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid2}
+{\list\listtemplateid3\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid201\'02\'00.;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid3}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}{\listoverride\listid3\listoverridecount0\ls3}}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab560
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\fs26 \cf0 \
+Kubernetes: Its a open source container orchestration platform.\
+\
+\pard\pardeftab560\partightenfactor0
+
+\f1\b\fs40 \cf0 By default Kubernetes is installed as a cluster. I.e group of nodes.\
+Kube depends on yaml file.\
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\b0\fs26 \cf0 \
+\
+Worker node:\
+1. Kube proxy: generating cluster IP address, gives IP address, expose to outside, load balancer . \
+2. Kubelet. Creation of pods. This will deal with Api . This ensures pod is always running else inform to control manager.\
+3. Container runtime. Running container.\
+\
+\
+MasterNode:\
+1. Api server: gives input and output.\
+2. kube Scheduler: just scheduling pods and resources based on api server information.\
+3. ETCD: backup or restore and info of all cluster. Its a key value store.\
+4. Controller Manager: To ensure all the pods are running based on mentioned replica sets. \
+5. Cloud controller manager:  \
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Deployment.yaml: which will deploy and run our services  same as container.\
+\
+Service.yml. name space and label should be matched so this will expose to outside world. \
+\
+ingress.yml : this will give many load balancers while sending traffic but instead (install and create  a single controller which sends traffic to necessary domains and expose visa service and it will have 1 load balancer ).\
+\
+IngressController.yml: This will have only one load balancer but can send traffic to all ingress files mentioned and sends traffic to desired domain sites.\
+\
+Horizontal Pod Autoscaling. (Scales when pods exceed Cpu usage )\
+\
+Horizontal Pod Autohealing (this will be created if the pod is down or getting deleted before completely down)\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Kubernetes Distributions you are using in production:\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 We are using many distributions like:\
+\pard\pardeftab560\pardirnatural\partightenfactor0
+\ls1\ilvl0\cf0 {\listtext	0.	}Kubernetes\
+{\listtext	0.	}Openshift\
+{\listtext	0.	}Rancher\
+{\listtext	0.	}Tanzo\
+{\listtext	0.	}EKS.    \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 \
+Difference between Kubernetes and EKS:\
+\
+Kubernetes will have to manage clusters on its own.\
+EKS: Amazon will provide support for eks incase of any problem.\
+\
+\
+\pard\pardeftab560\pardirnatural\partightenfactor0
+\ls2\ilvl0\cf0 {\listtext	0.	}Why Kubernetes is deployed as pod and not as docker container??\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0  A:  Instead of docker cmd line like docker run -it images - P -v \'85.   we are just putting all  the specification in pod.yml file.\
+\
+\
+Kubectl get pods -o wide\
+Kubectl create -f pod.yml\
+Kubectl  describe pod nginx \
+Kubectl get pods -v=7 this will give info what it is doing\
+Kubectl logs nginx\
+Kubectl delete pod pod id\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Kubeshark:8899 port \
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Create Docker file take it from abhishek\
+Create Deployment.yml : we can change labels and selectors and templates name. Keep it same. Give docker image name which u have created.\
+Create service.yml : Get the app name from deployment file only inside template. app: sample-python-app and change node port same  given in deployment file .\
+We can give type: Loadbalancer here itself.\
+\
+Kubectl apply -f Deployment.yml and service.yml.\
+\
+Kubectl get svc : To We can see of its a load bar or cluster based on  our requirements. \
+\
+Docker image public :  cmilanf/docker-snake. 3000 port\
+\
+Kubectl get ing : ngress.yml\
+\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Install Kubeshark for visualization of servers load balancing\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"\
+\
+echo 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' >> ~/.bashrc\
+source ~/.bashrc\
+\
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Ingress with Ingress Controller:\
+\
+certbot certonly --manual --preferred-challenges=dns --key-type rsa --email \\\
+tvsravya95@gmail.com \\\
+--server https://acme-v02.api.letsencrypt.org/directory --agree-tos \\\
+-d *.kuttysravya.shop -d kuttysravya.shop\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 cd /etc/letsencrypt/live/kuttysravya.shop/\
+cat fullchain.pem > tls.crt\
+cat privkey.pem > tls.key\
+Kubectl apply -f ingress-tls.yml\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 To change password for any username in ubuntu:\
+sudo passwd username\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 kubectl create secret tls awscloudops --cert=tls.crt --key=tls.key\
+\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0  sudo chmod 666 /var/run/docker.sock.  To give docker permissions\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+{\field{\*\fldinst{HYPERLINK "https://www.youtube.com/watch?v=hBGVwa8MY4A&list=PLIMuaFvdF6-g4EFO0MA2TWaQn9NuVJdTl&index=1"}}{\fldrslt \cf2 \ul \ulc2 https://www.youtube.com/watch?v=hBGVwa8MY4A&list=PLIMuaFvdF6-g4EFO0MA2TWaQn9NuVJdTl&index=1}}\ul \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 \ulnone \
+\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 RBAC:  User management and also managing access for services. \
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 To manage:\
+\pard\pardeftab560\pardirnatural\partightenfactor0
+\ls3\ilvl0\cf0 {\listtext	0.	}Service accounts /users. \
+{\listtext	0.	}Roles, cluster roles.\
+{\listtext	0.	}Role binding,  Cluster role binding.\
+{\listtext	0.	}\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 Kubernetes doesn\'92t deal directly with user management like user add etc. It offloads with identity providers.  Eg : AWS EKS IAM Roles to access Kube. \
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 For service account/user  \'97> create user and create role. Using role binding we attach role to user.\
+\
+Note: Creating role within namespace is called role.  Within cluster is cluster role.\
+}

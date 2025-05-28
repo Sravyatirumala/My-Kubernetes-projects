@@ -1,0 +1,588 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2639
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 HelveticaNeue;\f2\fnil\fcharset0 HelveticaNeue-Bold;
+\f3\froman\fcharset0 Times-Roman;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww28600\viewh14620\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \
+GitHub \'97> jenkins \'97> sonarqube (code quality analysis) \'97> Owasp (deep level scanning) \'97>  Trivy  (perform file system scan) \'97> docker image \'97> by container \'97> email notifications.\
+\
+Deploy app in kubernetes \'97> prometheus and grafana (Monitoring tools)\
+\
+\
+Bookmyshow project:  https://github.com/Sravyatirumala/Book-My-Show.git\
+\
+\
+Create instance.\
+Security ports:  80,443, 25(SMTP) ,30000-33000 (Kubernetes eks cluster) , 8080(Jenkins) , 3000-10000, 6443, 22,465 (SMTPS)\
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f1\fs26 \cf0 \'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\fs24 \cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 2. Install docker and login to docker hub:\
+Docker login -u sravyatirumala\
+pass:\
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f1\fs26 \cf0 \'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\fs24 \cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 3. Install Trivy:\
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f1\fs26 \cf0 sudo apt-get install wget apt-transport-https gnupg lsb-release\
+wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null\
+echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list\
+sudo apt-get update\
+sudo apt-get install trivy\
+\
+\
+\
+Or  using shell script.\
+ Vi trivy.sh \
+#!/bin/bash\
+sudo apt-get install wget apt-transport-https gnupg\
+wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null\
+echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee -a /etc/apt/sources.list.d/trivy.list\
+sudo apt-get update\
+sudo apt-get install trivy\
+\
+----> sudo chmod +x trivy.sh ----> ./trivy.sh ----> trivy --version.  0.60.0\
+\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+4. Code quality analysis L Sonarcube\
+\
+docker run -d --name sonar -p 9000:9000 --restart always sonarqube:lts-community\
+docker update \'97restart=always sonar\
+\
+Default id and password is "admin"\
+\
+docker images\
+ Login to sonarqube. Ip:9000\
+By default username : admin\
+                         Pass:admin. We cn change after entering: \
+admin \
+sravya\
+\
+Go to Administration \'97> security \'97> users \'97> generate token .\
+This we have to configure in Jenkins.\
+\
+Manage Jenkins \'97> Credentials : Add Secret text.    \
+squ_6c8993f994f0d746764937820fd7322fd13389ca\
+\
+Id: Sonar-token\
+\
+Give Docker credentials also: \
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+\
+5. Create Sonarqube web hooks in SQ dashboard:  Sonarqube will get data from Jenkins and will trigger and check code \
+Under configuration \'97> web hooks \'97> Name : jenkins \'97> Jenkins URL\
+http://3.138.66.92:8080/sonarqube-webhook/.   (Telling SQ where Jenkins is running)\
+\
+We need to give SQ in Jenkins also: sonarqube will get data from Jenkins\
+System Config: Sonarqube servers:  sonar-server \'97> http://3.138.66.92:9000 \'97>authentication: sonar-token  give same token .\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+6. Setup Jenkins:\
+Install below plugins;\
+Eclipse Temurin Installer, SonarQube scanner, NodeJS, Docker, Docker Commons, Docker Pipeline, Docker API, docker-build-step, OWASP dependency check, Pipeline stage view, Email Extension Template, Kubernetes, Kubernetes CLI, Kubernetes Client API, Kubernetes Credentials, Config File Provider, Prometheus metrics\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+7. Manage Jenkins \'97> Tools \'97> \
+JDK Installations: jdk17 \'97> install manually (Install from adoption.net) we have installed plugin called eclipse .\
+Sonarqube-scanner installations : sonar-scanner\
+Add NodeJS \'97> node 23 latest version.\
+(OWAS )Dependency Check-installations: DP-Check \'97> Add Installer (GitHub.com)\
+Docker: docker \'97> install automatically : latest\
+\
+Note :OWAS fs scan is open source tool which scans project dependencies for vulnerabilities.\
+It examines lib and dependencies a project uses and checks them against db.\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+8. For Emails while build and any actions:\
+Manage Jenkins \'97> Credentials\'97> system\'97> new : username and password:\
+\
+To get Secrets and make sure 2 step verification is enable : \
+Type App Passwords in search bar :  username : email id \
+Passwrd:  
+\f2\b rroqpjxvpsvdexzq.  (We got from email app passwords)\
+Id: email-creds\
+\
+\
+We need to get notifications: \
+Manage Jenkins \'97> system \'97> extended email \'97> smtp.gmail.com \'97> 465 \'97> advanced credentials: email-creds\'97> select Use SSL and Oauth2.0 \
+Default content type: \'97> HTML\
+
+\f1\b0 Email-Notify :  smtp.gmail.com \'97> use smtp auth \'97> email id and password same 
+\f2\b rroqpjxvpsvdexzq \'97> use SSL \'97> 465 \'97> reply to email id  and test it . \
+Default triggers : \'97> success, failure, always\
+
+\f1\b0 \
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+8.  Setup eks cluster. EKS Custer version: 1.30  Already created from Jenkins build parameters.\
+\
+9. sudo apt install npm.\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+10. Create Job\'97> pipeline  in Jenkins copy Jenkins file 1 syntax.\
+In pipeline copy that code and Go to pipeline syntax \'97> Git give git repo link  if its not changed \
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+11. Build now we can see stages. Go to sonarqube and check for any bugs or vulnerabilities in projects.\
+\
+Once the build is done docker image will be available in docker hub \'97 > BMS\
+\
+If  we get docker.sock issue:\
+ls -l /var/run/docker.sock\
+sudo chmod 660 /var/run/docker.sock\
+sudo systemctl restart jenkins.   And agian build pipeline.\
+\
+sudo usermod -aG docker jenkins\
+sudo systemctl restart docker\
+sudo systemctl restart jenkins\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+12.  Got to server check if jenkins user is there: \'97> ps \
+\
+# sudo usermod -aG docker jenkins\
+ps aux | grep jenkins. \'97> if user is jenkins go to jenkins.\
+sudo -su jenkins\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+13. Aws configure \'97> configure the credentials with access keys.\
+Verify the credentials\
+\
+aws sts get-caller-identity.. sts= simple token service.\
+\
+\
+ Sudo -su jenkins\
+aws eks update-kubeconfig --name my-eks-cluster  \'97region us-east-2\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+Create new instance or we can use same old instance if we have space.\
+\
+14. Create a dedicated Linux user sometimes called a 'system' account for Prometheus\
+sudo apt update \
+\
+ sudo useradd \\\
+    --system \\\
+    --no-create-home \\\
+    --shell /bin/false prometheus.  \'97> we have created a 'Prometheus' user\
+\
+\
+Explanation of above command\
+\'96system \'96 Will create a system account.\
+\'96no-create-home \'96 We don\'92t need a home directory for Prometheus or any other system accounts in our case.\
+\'96shell /bin/false \'96 It prevents logging in as a Prometheus user.\
+Prometheus \'96 Will create a Prometheus user and a group with the same name.\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+15.  Download the Prometheus\
+sudo wget https://github.com/prometheus/prometheus/releases/download/v2.47.1/prometheus-2.47.1.linux-amd64.tar.gz\
+tar -xvf prometheus-2.47.1.linux-amd64.tar.gz\
+sudo mkdir -p /data /etc/prometheus\
+cd prometheus-2.47.1.linux-amd64/\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+Move the Prometheus binary and a promtool to the /usr/local/bin/. promtool is used to check configuration files and Prometheus rules.\
+16. sudo mv prometheus promtool /usr/local/bin/\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+Move console libraries to the Prometheus configuration directory\
+17. sudo mv consoles/ console_libraries/ /etc/prometheus/\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+Move the example of the main Prometheus configuration file\
+18.  sudo mv prometheus.yml /etc/prometheus/prometheus.yml\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+Set the correct ownership for the /etc/prometheus/ and data directory\
+19. sudo chown -R prometheus:prometheus /etc/prometheus/ /data/\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+Delete the archive and a Prometheus tar.gz file \
+cd\
+You are in ~ path\
+20.  rm -rf prometheus-2.47.1.linux-amd64.tar.gz\
+\
+prometheus --version\
+You will see as "version 2.47.1"\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+21.  sudo nano /etc/systemd/system/prometheus.service\
+\
+Paste the below content:\
+\
+[Unit]\
+Description=Prometheus\
+Wants=network-online.target\
+After=network-online.target\
+StartLimitIntervalSec=500\
+StartLimitBurst=5\
+[Service]\
+User=prometheus\
+Group=prometheus\
+Type=simple\
+Restart=on-failure\
+RestartSec=5s\
+ExecStart=/usr/local/bin/prometheus \\\
+  --config.file=/etc/prometheus/prometheus.yml \\\
+  --storage.tsdb.path=/data \\\
+  --web.console.templates=/etc/prometheus/consoles \\\
+  --web.console.libraries=/etc/prometheus/console_libraries \\\
+  --web.listen-address=0.0.0.0:9090 \\\
+  --web.enable-lifecycle\
+[Install]\
+WantedBy=multi-user.target\
+\
+\
+sudo systemctl daemon-reload\
+sudo systemctl enable prometheus\
+sudo systemctl start prometheus\
+sudo systemctl status prometheus\
+Open Port No. 9090\
+\
+You can see the Prometheus console.\
+Click on 'Status' dropdown ---> Click on 'Targets' ---> You can see 'Prometheus (1/1 up)\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+NODE-EXPORTER  for logs :\
+\
+22.  This is for worker node configurations::\
+\
+Create a system user for Node Exporter and download Node Exporter:\
+\
+sudo useradd --system --no-create-home --shell /bin/false node_exporter\
+wget https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz\
+\
+Extract Node Exporter files, move the binary, and clean up:\
+tar -xvf node_exporter-1.6.1.linux-amd64.tar.gz\
+sudo mv node_exporter-1.6.1.linux-amd64/node_exporter /usr/local/bin/\
+rm -rf node_exporter*\
+\
+node_exporter --version\
+\
+\
+Enable and start Node Exporter:\
+sudo systemctl enable node_exporter\
+sudo systemctl start node_exporter\
+\
+\
+Or:\
+If we get this error:\
+\pard\pardeftab720\partightenfactor0
+
+\f3\fs28 \cf0 \expnd0\expndtw0\kerning0
+sudo systemctl enable node_exporter Failed to enable unit: Unit file node_exporter.service does not exist.\
+\pard\pardeftab720\partightenfactor0
+
+\fs24 \cf0 \
+
+\f1\fs26 \kerning1\expnd0\expndtw0 Steps:\
+\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 sudo nano /etc/systemd/system/node_exporter.service\
+\
+\
+[Unit]\
+Description=Prometheus Node Exporter\
+Documentation=https://github.com/prometheus/node_exporter\
+\
+[Service]\
+User=nobody\
+Group=nogroup\
+Type=simple\
+ExecStart=/usr/local/bin/node_exporter\
+\
+[Install]\
+WantedBy=multi-user.target\
+\
+sudo systemctl daemon-reload\
+sudo systemctl enable node_exporter\
+sudo systemctl start node_exporter\
+\
+\
+sudo systemctl status node_exporter\
+\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+23. Configure Prometheus Plugin Integration\
+\
+Integrate Jenkins with Prometheus to monitor the CI/CD pipeline.:\
+\
+Prometheus Configuration::\
+cd /etc/prometheus/ \
+\
+sudo vi prometheus.yml\
+\
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.\
+rule_files:\
+  # - "first_rules.yml"\
+  # - "second_rules.yml"\
+\
+# A scrape configuration containing exactly one endpoint to scrape:\
+# Here it's Prometheus itself.\
+scrape_configs:\
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.\
+  - job_name: "prometheus"\
+    static_configs:\
+      - targets: ["localhost:9090"]\
+\
+  - job_name: 'node_exporter'\
+    static_configs:\
+      - targets: ['3.138.66.92:9100']\
+\
+  - job_name: 'jenkins'\
+    metrics_path: '/prometheus'\
+    static_configs:\
+      - targets: ['3.138.66.92:8080']\
+\
+\
+Check the validity of the configuration file:\
+promtool check config /etc/prometheus/prometheus.yml\
+\
+You should see "SUCCESS" when you run the above command, it means every configuration made so far is good.\
+\
+Reload the Prometheus configuration without restarting:\
+curl -X POST http://localhost:9090/-/reload\
+\
+Access Prometheus in browser (if already opened, just reload the page):\
+http://<your-prometheus-ip>:9090/targets\
+\
+For Node Exporter you will see (0/1) in red colour. To resolve this, open Port number 9100 for Monitoring VM\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+24. Install Grafana :\
+\
+sudo apt-get update\
+sudo apt-get install -y apt-transport-https software-properties-common\
+\
+cd ---> You are now in ~ path\
+Add the GPG key for Grafana:\
+wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -\
+\
+Step 3: Add Grafana Repository:\
+echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list\
+\
+Step 4: Update and Install Grafana:\
+\
+sudo apt-get update\
+sudo apt-get -y install grafana\
+\
+Step 5: Enable and Start Grafana Service:\
+sudo systemctl enable grafana-server\
+\
+Start Grafana:\
+sudo systemctl start grafana-server\
+\
+\pard\pardeftab720\partightenfactor0
+\cf0 The default port for Grafana is 3000\
+http://<monitoring-server-ip>:3000\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 \
+Default id and password is "admin"\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+25.  Go to data sources \'97> Prometheus \'97> Import dashboard \'97> Give proemths URL  http://18.117.196.106:9090. \'97> Save & Test.\
+\
+\
+Adding Dashboards in Grafana \
+Once prometheus is added  Click on import dashboard.\
+\
+DateResource \'97> Import dashboard \
+(URL: https://grafana.com/grafana/dashboards/1860-node-exporter-full/) \
+Now add Node Exporter dashboard  \'97> https://grafana.com/grafana/dashboards/1860-node-exporter-full/.  \
+Click Default:  give Prometheus url : http://3.138.66.92:9090 (Remove / at the end )\
+Default link \'97 > Copy to clipboard.\
+\
+\
+\
+Lets add another dashboard for Jenkins;\
+(URL: https://grafana.com/grafana/dashboards/9964-jenkins-performance-and-health-overview/)\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+Kubectl get svc  -o wide \'97> we get sec as load balancer. We can  get Bookmy show website using load balancer ip.\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\
+\
+Pipeline :\
+\
+\
+pipeline \{\
+    agent any\
+    tools \{\
+        jdk 'jdk17'\
+        nodejs 'node23'\
+    \}\
+    environment \{\
+        SCANNER_HOME = tool 'sonar-scanner'\
+    \}\
+    stages \{\
+        stage('Clean Workspace') \{\
+            steps \{\
+                cleanWs()\
+            \}\
+        \}\
+        stage('Checkout from Git') \{\
+            steps \{\
+                git branch: 'main', url: 'https://github.com/Sravyatirumala/Book-My-Show.git'\
+                sh 'ls -la'  // Verify files after checkout\
+            \}\
+        \}\
+        stage('SonarQube Analysis') \{\
+            steps \{\
+                withSonarQubeEnv('sonar-server') \{\
+                    sh ''' \
+                    $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=BMS \\\
+                    -Dsonar.projectKey=BMS \
+                    '''\
+                \}\
+            \}\
+        \}\
+        stage('Quality Gate') \{\
+            steps \{\
+                script \{\
+                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token'\
+                \}\
+            \}\
+        \}\
+        stage('Install Dependencies') \{\
+            steps \{\
+                sh '''\
+                cd bookmyshow-app\
+                ls -la  # Verify package.json exists\
+                if [ -f package.json ]; then\
+                    rm -rf node_modules package-lock.json  # Remove old dependencies\
+                    npm install  # Install fresh dependencies\
+                else\
+                    echo "Error: package.json not found in bookmyshow-app!"\
+                    exit 1\
+                fi\
+                '''\
+            \}\
+        \}\
+      //  stage('OWASP FS Scan') \{\
+       //     steps \{\
+        //        dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'\
+        //       dependencyCheckPublisher pattern: '**/dependency-check-report.xml'\
+        //   \}\
+   //   \} \
+        stage('Trivy FS Scan') \{\
+            steps \{\
+                sh 'trivy fs . > trivyfs.txt'\
+            \}\
+        \}\
+        stage('Docker Build & Push') \{\
+            steps \{\
+                script \{\
+                    withDockerRegistry(credentialsId: 'Docker-creds', toolName: 'Docker-creds') \{\
+                        sh ''' \
+                        echo "Building Docker image..."\
+                        docker build --no-cache -t sravyatirumala/bms:latest -f bookmyshow-app/Dockerfile bookmyshow-app\
+\
+                        echo "Pushing Docker image to registry..."\
+                        docker push sravyatirumala/bms:latest\
+                        '''\
+                    \}\
+                \}\
+            \}\
+        \}\
+        stage('Deploy to Container') \{\
+            steps \{\
+                sh ''' \
+                echo "Stopping and removing old container..."\
+                docker stop bms || true\
+                docker rm bms || true\
+\
+                echo "Running new container on port 3000..."\
+                docker run -d --restart=always --name bms -p 3000:3000 sravyatirumala/bms:latest\
+\
+                echo "Checking running containers..."\
+                docker ps -a\
+\
+                echo "Fetching logs..."\
+                sleep 5  # Give time for the app to start\
+                docker logs bms\
+                '''\
+            \}\
+        \}\
+    \}\
+\
+    stage('Deploy to EKS Cluster') \{\
+            steps \{\
+                script \{\
+                    sh '''\
+                    echo "Verifying AWS credentials..."\
+                    aws sts get-caller-identity\
+\
+                    echo "Configuring kubectl for EKS cluster..."\
+                    aws eks update-kubeconfig --name my-eks-cluster --region us-east-2\
+\
+                    echo "Verifying kubeconfig..."\
+                    kubectl config view\
+\
+                    echo "Deploying application to EKS..."\
+                    kubectl apply -f deployment.yml\
+                    kubectl apply -f service.yml\
+\
+                    echo "Verifying deployment..."\
+                    kubectl get pods\
+                    kubectl get svc\
+                    '''\
+                \}\
+            \}\
+        \}\
+    \}\
+\
+    post \{\
+        always \{\
+            emailext attachLog: true,\
+                subject: "'$\{currentBuild.result\}'",\
+                body: "Project: $\{env.JOB_NAME\}<br/>" +\
+                      "Build Number: $\{env.BUILD_NUMBER\}<br/>" +\
+                      "URL: $\{env.BUILD_URL\}<br/>",\
+                to: 'tvsravya95@gmail.com',\
+                attachmentsPattern: 'trivyfs.txt,trivyimage.txt'\
+        \}\
+    \}\
+\}\
+\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85\'85..\
+\pard\pardeftab720\partightenfactor0
+\cf0              ******. THE END  *****\
+\pard\pardeftab560\slleading20\partightenfactor0
+\cf0 \
+\
+\
+\
+\
+\
+}
